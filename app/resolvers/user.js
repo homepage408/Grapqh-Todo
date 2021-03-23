@@ -58,17 +58,19 @@ const resolvers = {
         },
       });
       if (dataEmail == undefined) {
+        const { salt, hash } = hashing(args.password);
+        const data = await db.user.create({
+          username: args.username,
+          email: args.email,
+          password: hash,
+          salt: salt,
+          photo: "",
+        });
+        return data;
+      } else{
         throw new Error("Email atau Username Harus Unique");
-      }
-      const { salt, hash } = hashing(args.password);
-      const data = await db.user.create({
-        username: args.username,
-        email: args.email,
-        password: hash,
-        salt: salt,
-        photo: "",
-      });
-      return data;
+      } 
+      
     },
 
     async updateUser(parent, args, { db }) {

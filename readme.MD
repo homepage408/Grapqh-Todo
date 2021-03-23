@@ -13,3 +13,5 @@
 7. hot reload `npm run dev`
 8. node `npm start`
 
+9. upload photo users endpoint `localhost:3000/upload/:id/photo`
+10. upload file todos endpoint `localhost:3000/upload/:id/attachment`
