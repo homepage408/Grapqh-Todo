@@ -2,7 +2,7 @@
 const faker = require("faker");
 const todo = [...Array(10)].map((item) => {
   return {
-    userId: faker.random.number({ min: 1, max: 9 }),
+    userId: faker.random.number({ min: 1, max: 6 }),
     title: faker.lorem.word(),
     description: faker.lorem.sentences(),
     attachment: "",

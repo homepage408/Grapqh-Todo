@@ -1,6 +1,7 @@
 const { verifyJWT, generateJWT } = require("../utils/middleware/authJwt");
 const { hashing } = require("./../utils/helpers/hashPasword");
 const bcrypt = require("bcrypt");
+const Op = require('sequelize').Op;
 
 const resolvers = {
   Query: {
@@ -8,9 +9,18 @@ const resolvers = {
       const data = await db.user.findAll({
         include: db.todo,
       });
-      console.log(data);
+      // console.log(data);
       return data;
     },
+
+    async findUser(parent,args,{db}){
+      return db.user.findOne({
+        where:{
+          id:args.id
+        },
+        include:db.todo
+      })
+    }
   },
 
   Mutation: {
@@ -43,10 +53,12 @@ const resolvers = {
     // User
     async createUser(parent, args, { db }) {
       const dataEmail = await db.user.findOne({
-        where: { email: args.email },
+        where: {
+          [Op.or]:[{email:args.email},{username:args.username}]
+        },
       });
-      if (dataEmail) {
-        throw new Error("Email Harus Unique");
+      if (dataEmail == undefined) {
+        throw new Error("Email atau Username Harus Unique");
       }
       const { salt, hash } = hashing(args.password);
       const data = await db.user.create({
@@ -54,25 +66,34 @@ const resolvers = {
         email: args.email,
         password: hash,
         salt: salt,
-        photo: args.photo,
+        photo: "",
       });
       return data;
     },
 
     async updateUser(parent, args, { db }) {
-      const { salt, hash } = hashing(args.password);
-      const newData = {
-        username: args.username,
-        email: args.email,
-        password: hash,
-        salt: salt,
-      };
-      const data = await db.user.update(newData, {
-        where: { id: args.id },
+      const dataEmail = await db.user.findOne({
+        where: {
+          [Op.or]:[{email:args.email},{username:args.username}]
+        },
       });
-      if (data[0]) {
-        const dataBaru = await db.user.findByPk(args.id);
-        return dataBaru;
+      // console.log(dataEmail == undefined)
+      if(dataEmail == undefined){
+        // const { salt, hash } = hashing(args.password);
+        const newData = {
+          username: args.username,
+          email: args.email,
+
+        };
+        const data = await db.user.update(newData, {
+          where: { id: args.id },
+        });
+        if (data[0]) {
+          const dataBaru = await db.user.findByPk(args.id);
+          return dataBaru;
+        }
+      } else {
+        throw new Error("Username atau email tidak boleh sama")
       }
     },
 

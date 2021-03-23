@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       todo.belongsTo(models.user);
+      todo.hasMany(models.comment)
     }
   }
   todo.init(
