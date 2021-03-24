@@ -5,8 +5,8 @@ const { typeDefs } = require("./app/schema");
 const db = require("./app/db/models");
 const { resolvers } = require("./app/resolvers");
 const cloudinary = require("./app/utils/helpers/cloudinary");
-const { uploadPhoto, uploadAttachment } = require("./app/utils/helpers/multer");
-const morgan = require("morgan");
+// const { uploadPhoto, uploadAttachment } = require("./app/utils/helpers/multer");
+// const morgan = require("morgan");
 const path = require("path");
 
 const app = express();
@@ -17,6 +17,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
+    console.log("Context");
     const auth = req.headers.authorization;
     return {
       req,
@@ -39,45 +40,48 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.patch("/upload/:id/photo", uploadPhoto.single("file"), async (req, res) => {
-  const result = await cloudinary.uploader.upload(req.file.path);
-  const newData = {
-    photo: result.url,
-  };
-  const data = await db.user.update(newData, {
-    where: {
-      id: req.params.id,
-    },
-  });
-  if (data) {
-    res.json({ message: "berhasil" });
-  }
-});
+// app.patch("/upload/:id/photo", uploadPhoto.single("file"), async (req, res) => {
+//   const result = await cloudinary.uploader.upload(req.file.path);
+//   const newData = {
+//     photo: result.url,
+//   };
+//   const data = await db.user.update(newData, {
+//     where: {
+//       id: req.params.id,
+//     },
+//   });
+//   console.log(data);
+//   if (data[0]) {
+//     res.json({ message: "berhasil" });
+//   } else {
+//      res.json({message:"gagal"});
+//   }
+// });
 
-app.patch(
-  "/upload/:id/attachment",
-  uploadAttachment.single("file"),
-  async (req, res) => {
-    try {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      const newData = {
-        attachment: result.url,
-      };
-      const data = await db.todo.update(newData, {
-        where: {
-          id: req.params.id,
-        },
-      });
-      if (data) {
-        res.json({ message: "berhasil" });
-      }
-    } catch (error) {
-      res.json({
-        message:error
-      });
-    }
-  }
-);
+// app.patch(
+//   "/upload/:id/attachment",
+//   uploadAttachment.single("file"),
+//   async (req, res) => {
+//     try {
+//       const result = await cloudinary.uploader.upload(req.file.path);
+//       const newData = {
+//         attachment: result.url,
+//       };
+//       const data = await db.todo.update(newData, {
+//         where: {
+//           id: req.params.id,
+//         },
+//       });
+//       if (data) {
+//         res.json({ message: "berhasil" });
+//       }
+//     } catch (error) {
+//       res.json({
+//         message:error
+//       });
+//     }
+//   }
+// );
 
 app.listen(process.env.PORT || port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

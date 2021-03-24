@@ -8,6 +8,7 @@ const resolvers = {
       // const { loggedIn, user } = isLoggedIn(auth);
       //   console.log({ user });
       // if (loggedIn) {
+        console.log("Todo");
       return await db.todo.findAll({
         include: db.comment,
       });
